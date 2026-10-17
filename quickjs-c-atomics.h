@@ -49,6 +49,26 @@
 #define atomic_fetch_sub(obj, arg) \
     __atomic_fetch_sub(obj, arg, __ATOMIC_SEQ_CST)
 #define _Atomic
+#elif (defined __ZEPHYR__)
+#include <zephyr/kernel.h>
+#define atomic_fetch_add(obj, arg) \
+  atomic_add(obj, arg)
+#define atomic_compare_exchange_strong(obj, expected, desired) \
+  atomic_cas(obj, expected, desired)
+#define atomic_exchange(obj, desired) \
+    atomic_cas(obj, expected, desired)
+#define atomic_load(obj) \
+  atomic_get(obj)
+#define atomic_store(obj, desired) \
+  atomic_set(obj, desired)
+#define atomic_fetch_or(obj, arg) \
+  atomic_or(obj, arg)
+#define atomic_fetch_xor(obj, arg) \
+  atomic_xor(obj, arg)
+#define atomic_fetch_and(obj, arg) \
+  atomic_and(obj, arg)
+#define atomic_fetch_sub(obj, arg) atomic_sub(obj, arg)
+#define _Atomic
 #else
 #include <stdatomic.h>
 #endif

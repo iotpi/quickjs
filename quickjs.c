@@ -72,7 +72,7 @@
 // atomic_store etc. are completely busted in recent versions of tcc;
 // somehow the compiler forgets to load |ptr| into %rdi when calling
 // the __atomic_*() helpers in its lib/stdatomic.c and lib/atomic.S
-#if !defined(__TINYC__) && !defined(EMSCRIPTEN) && !defined(__wasi__) && !__STDC_NO_ATOMICS__ && !defined(__DJGPP)
+#if !defined(__TINYC__) && !defined(EMSCRIPTEN) && !defined(__wasi__) && !__STDC_NO_ATOMICS__ && !defined(__DJGPP) &&!defined(__ZEPHYR__)
 #include "quickjs-c-atomics.h"
 #define CONFIG_ATOMICS
 #endif
@@ -2537,6 +2537,7 @@ JSContext *JS_NewContext(JSRuntime *rt)
     if (!ctx)
         return NULL;
 
+    /*
     if (JS_AddIntrinsicBaseObjects(ctx) ||
         JS_AddIntrinsicDate(ctx) ||
         JS_AddIntrinsicEval(ctx) ||
@@ -2549,6 +2550,56 @@ JSContext *JS_NewContext(JSRuntime *rt)
         JS_AddIntrinsicWeakRef(ctx) ||
         JS_AddIntrinsicAToB(ctx) ||
         JS_AddPerformance(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+    */
+
+    if (JS_AddIntrinsicBaseObjects(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+    if(JS_AddIntrinsicDate(ctx)) {
+      JS_FreeContext(ctx);
+      return NULL;
+    }
+    if( JS_AddIntrinsicEval(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+    if(JS_AddIntrinsicRegExp(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicJSON(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicProxy(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicMapSet(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicTypedArrays(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicPromise(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicWeakRef(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddIntrinsicAToB(ctx)) {
+        JS_FreeContext(ctx);
+        return NULL;
+    }
+      if(JS_AddPerformance(ctx)) {
         JS_FreeContext(ctx);
         return NULL;
     }
